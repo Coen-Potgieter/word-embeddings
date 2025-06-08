@@ -11,17 +11,17 @@ import * as tf from "@tensorflow/tfjs";
 
 const WordMath: React.FC = () => {
   const [validWord, setValidWord] = useState<string[]>(["", ""]);
-  const [newWord, setNewWord] = useState<string>("...");
+  const [newWord, setNewWord] = useState<string[]>(["...", "..."]);
   // First `+` is never rendered. Dont ask
   const [operators, setOperators] = useState<string[]>(["+", "+"]);
   const { embeddings } = useEmbeddings();
 
   const currWordIsValid: boolean[] = validWord.map((word) => word.length != 0);
 
-  function handleValidWord(newWord: string, id: number): void {
+  function handleValidWord(updatedWord: string, id: number): void {
     setValidWord((prevState) => {
       const newState = [...prevState];
-      newState[id] = newWord;
+      newState[id] = updatedWord;
       return newState;
     });
   }
@@ -68,7 +68,8 @@ const WordMath: React.FC = () => {
 
   const allWordsValid = currWordIsValid.every((value) => value === true);
 
-  useEffect(() => {
+  let cosSim = "...";
+  function handleCalc() {
     if (!allWordsValid) return;
 
     // All words valid, now calculate new vector
@@ -81,12 +82,16 @@ const WordMath: React.FC = () => {
       );
     }
 
-    findMostSimilar(runningResult, embeddings).then((bestWord) => {
-      setNewWord(bestWord);
-    });
-    // setNewWord(bestWord);
-  }, [...validWord]);
-
+    findMostSimilar(runningResult, embeddings, validWord).then(
+      ([bestWord, bestSim]) => {
+        setNewWord([bestWord, bestSim.toPrecision(4)]);
+      },
+    );
+  }
+  // TODO: Make calc button cause some loading animation
+  // TODO: Change where calc button lives and make it look nicer
+  // TODO: Add a graph, Im thinking to make valid words apear like normal in graph, then we calculated we add that vector
+  // NOTE: Good Luck my freind...
   return (
     <div>
       <div className="flex-col text-center">
@@ -114,8 +119,8 @@ const WordMath: React.FC = () => {
           })}
         </div>
         <div className="flex-col text-3xl font-curvy font-bold">
-          <p>= {newWord} </p>
-          <p>With ... Similarity</p>
+          <p>= {newWord[0]} </p>
+          <p>With {newWord[1]} Similarity</p>
         </div>
         <div className="flex justify-around font-curvy text-4xl font-semibold py-3">
           <button
@@ -131,6 +136,7 @@ const WordMath: React.FC = () => {
           >
             Remove Word
           </button>
+          <button onClick={handleCalc}>Calc</button>
         </div>
       </div>
     </div>

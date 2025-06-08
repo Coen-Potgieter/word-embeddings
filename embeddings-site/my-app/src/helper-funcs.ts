@@ -107,16 +107,21 @@ export function vectorOperation(
 export async function findMostSimilar(
   queryTensor: tf.Tensor1D,
   vectorMap: Map<string, tf.Tensor1D>,
+  excludedKeys: string[] = [],
   batchSize = 10000,
-): Promise<string> {
+): Promise<[string, number]> {
+  // Now returns a tuple of string and number
   // Normalize the query vector
   const normalizedQuery = queryTensor.div(tf.norm(queryTensor));
 
   let maxSimilarity = -1;
   let bestKey = "";
 
+  // Convert excludedKeys to Set for faster lookups
+  const excludedSet = new Set(excludedKeys);
+
   // Process in batches to avoid memory issues
-  const keys = Array.from(vectorMap.keys());
+  const keys = Array.from(vectorMap.keys()).filter((k) => !excludedSet.has(k));
 
   for (let i = 0; i < keys.length; i += batchSize) {
     const batchKeys = keys.slice(i, i + batchSize);
@@ -155,5 +160,5 @@ export async function findMostSimilar(
     ]);
   }
 
-  return bestKey;
+  return [bestKey, maxSimilarity]; // Now returning both key and similarity
 }
