@@ -11,20 +11,20 @@ const Header: React.FC<HeaderProps> = ({
   selectedSection,
   onSectionSelect,
 }) => {
-  const selectedStyle = " bg-my-yellow ring-3 underline  text-xl";
+  const selectedStyle = " bg-my-yellow ring-3 underline";
   const nonSelectedStyle =
     " bg-transparent hover:bg-my-yellow hover:underline hover:ring-3 cursor-pointer";
 
   return (
-    <div className="flex h-15 mt-10 mx-40 mb-2 justify-around">
+    <div className="flex h-20 mt-10 mx-80 mb-4 justify-around text-4xl">
       {sectionNames.map((elem) => {
         return (
           <button
             className={
               elem.id === selectedSection
-                ? "decoration-2 w-full mx-1 rounded-2xl font-curvy font-extrabold text-xl" +
+                ? "decoration-2 w-full mx-1 rounded-2xl font-curvy font-extrabold" +
                   selectedStyle
-                : "decoration-2 w-full mx-1 rounded-2xl font-curvy font-extrabold text-xl" +
+                : "decoration-2 w-full mx-1 rounded-2xl font-curvy font-extrabold" +
                   nonSelectedStyle
             }
             key={elem.id}
