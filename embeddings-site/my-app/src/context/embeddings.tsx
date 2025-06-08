@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import * as tf from "@tensorflow/tfjs";
 
 // Type of each embedding
-type EmbeddingMap = Map<string, number[]>;
+type EmbeddingMap = Map<string, tf.Tensor1D>;
 
 interface EmbeddingContextType {
   embeddings: EmbeddingMap | null;
@@ -24,11 +25,19 @@ export const EmbeddingProvider: React.FC<{ children: React.ReactNode }> = ({
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    console.log("Executed loading");
     fetch("data/embeddings-data.json")
       .then((res) => res.json())
       .then((obj) => {
-        setEmbeddings(new Map<string, number[]>(Object.entries(obj)));
+        // Convert JSON object to Map<string, tf.Tensor1D>
+        const embeddingsMap = new Map<string, tf.Tensor1D>();
+
+        Object.entries(obj).forEach(([key, value]) => {
+          if (Array.isArray(value)) {
+            embeddingsMap.set(key, tf.tensor1d(value as number[]));
+          }
+        });
+
+        setEmbeddings(embeddingsMap);
         setLoading(false);
       })
       .catch((err) => {

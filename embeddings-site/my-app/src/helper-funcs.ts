@@ -9,12 +9,10 @@ function calcEuclidNorm(vec: tf.Tensor1D): number {
 }
 
 export function calcCosSim(
-  nums1: number[] | undefined,
-  nums2: number[] | undefined,
+  vec1: tf.Tensor1D | undefined,
+  vec2: tf.Tensor1D | undefined,
 ): number | null {
-  if (nums1 && nums2) {
-    const vec1 = tf.tensor1d(nums1);
-    const vec2 = tf.tensor1d(nums2);
+  if (vec1 && vec2) {
     return (
       calcDotProduct(vec1, vec2) / (calcEuclidNorm(vec1) * calcEuclidNorm(vec2))
     );
@@ -58,4 +56,104 @@ export async function applyPCA(input: tf.Tensor1D): Promise<tf.Tensor1D> {
     const reduced = tf.matMul(centered.expandDims(0), componentsTensor); // [1, 3]
     return reduced.squeeze(); // [3]
   });
+}
+
+export function vectorOperation(
+  vec1: tf.Tensor1D,
+  vec2: tf.Tensor1D,
+  opp: string,
+): tf.Tensor1D {
+  if (opp === "+") {
+    return vec1.add(vec2);
+  } else if (opp === "-") {
+    return vec1.sub(vec2);
+  } else {
+    throw Error;
+  }
+}
+
+// export function findClosestWord(
+//   vec: tf.Tensor1D,
+//   excludedKeys: string[],
+//   embeddings: any,
+// ): [string, number] {
+//   // Naive Solution
+//   let bestWord = "";
+//   let bestSim = -2;
+
+//   let i = 0;
+//   for (const [key, value] of embeddings) {
+//     if (excludedKeys.includes(key)) continue; // Now this works!
+
+//     const checkVec = tf.tensor1d(value);
+//     const sim = calcDotProduct(vec, checkVec);
+
+//     if (sim > bestSim) {
+//       bestWord = key;
+//       bestSim = sim;
+//     }
+
+//     // checkVec.dispose(); // Important: Clean up tensors
+//     i += 1;
+//   }
+
+//   return [bestWord, bestSim];
+
+//   // TODO: gotta make this efficient. Or try naive and see if performance is that bad...
+//   // TODO: Also, think about using `useEffect` and state for the new word in `WordMath.tsx`
+
+// }
+
+export async function findMostSimilar(
+  queryTensor: tf.Tensor1D,
+  vectorMap: Map<string, tf.Tensor1D>,
+  batchSize = 10000,
+): Promise<string> {
+  // Normalize the query vector
+  const normalizedQuery = queryTensor.div(tf.norm(queryTensor));
+
+  let maxSimilarity = -1;
+  let bestKey = "";
+
+  // Process in batches to avoid memory issues
+  const keys = Array.from(vectorMap.keys());
+
+  for (let i = 0; i < keys.length; i += batchSize) {
+    const batchKeys = keys.slice(i, i + batchSize);
+    const batchTensors = batchKeys.map((k) => vectorMap.get(k)!);
+
+    // Stack all vectors in the batch into a 2D tensor
+    const batchMatrix = tf.stack(batchTensors);
+
+    // Normalize all vectors in the batch (L2 normalization)
+    const norms = tf.norm(batchMatrix, "euclidean", 1);
+    const normalizedBatch = batchMatrix.div(norms.expandDims(1));
+
+    // Compute cosine similarity (dot product with normalized vectors)
+    const similarities = tf
+      .matMul(normalizedBatch, normalizedQuery.reshape([50, 1]))
+      .reshape([-1]);
+
+    // Find max similarity in this batch
+    const { values, indices } = tf.topk(similarities, 1);
+    const currentMax = await values.data();
+    const index = await indices.data();
+
+    if (currentMax[0] > maxSimilarity) {
+      maxSimilarity = currentMax[0];
+      bestKey = batchKeys[index[0]];
+    }
+
+    // Clean up tensors to avoid memory leaks
+    tf.dispose([
+      batchMatrix,
+      norms,
+      normalizedBatch,
+      similarities,
+      values,
+      indices,
+    ]);
+  }
+
+  return bestKey;
 }

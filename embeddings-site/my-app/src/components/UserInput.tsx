@@ -29,10 +29,22 @@ const UserInput: React.FC<Props> = ({
     }
   }
 
+  let inputStyleState: string = "";
+  if (currValue === "") {
+    // ...
+  } else if (currIsValidWord[inputId]) {
+    inputStyleState = "ring-3 ring-green-600";
+  } else if (!currIsValidWord[inputId]) {
+    inputStyleState = "ring-3 ring-red-600";
+  }
+
   return (
     <>
       <input
-        className="bg-my-beige rounded-xl text-black focus:outline-none text-center font-curvy placeholder:opacity-20"
+        className={
+          "bg-my-beige rounded-xl text-black focus:outline-none text-center font-curvy placeholder:opacity-20 " +
+          inputStyleState
+        }
         type="text"
         required
         readOnly={loading}

@@ -59,6 +59,7 @@ const CosSimSection: React.FC = () => {
         <div className="flex justify-center pb-4">
           <VectorGraph
             words={validWord}
+            vectorCols={["#ff0000", "#0000ff"]}
             // background="#000"
             size={600}
             axisColor="#000"

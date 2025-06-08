@@ -68,6 +68,7 @@ const VectorArrow: React.FC<VectorProps> = ({
 
 type GraphProps = {
   words: string[];
+  vectorCols: string[];
   size?: number;
   background?: string;
   axisColor?: string;
@@ -120,6 +121,7 @@ const Axis = ({
 export const VectorGraph: React.FC<GraphProps> = ({
   words = ["", ""],
   size = 500,
+  vectorCols,
   background = "#123456",
   axisColor = "#888",
   axisWidth = 1,
@@ -132,49 +134,38 @@ export const VectorGraph: React.FC<GraphProps> = ({
     animate: boolean;
   } | null)[];
 
-  const [plottedVecs, setPlottedVecs] = useState<vecType>([null, null]);
+  const [plottedVecs, setPlottedVecs] = useState<vecType>([
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+  ]);
 
   useEffect(() => {
-    if (words[0] != "") {
-      applyPCA(tf.tensor1d(embeddings.get(words[0]))).then((word1) => {
-        console.log("Updated");
+    for (let i = 0; i < words.length; i++) {
+      if (words[i] != "") {
+        applyPCA(embeddings.get(words[i])).then((reducedVec) => {
+          setPlottedVecs((oldState) => {
+            const newState = [...oldState];
+            newState[i] = {
+              vec: reducedVec,
+              color: vectorCols[i],
+              animate: true,
+            };
+            return newState;
+          });
+        });
+      } else {
         setPlottedVecs((oldState) => {
           const newState = [...oldState];
-          newState[0] = {
-            vec: word1,
-            color: "#ff0000",
-            animate: true,
-          };
+          newState[i] = null;
           return newState;
         });
-      });
-    } else {
-      setPlottedVecs((oldState) => {
-        const newState = [...oldState];
-        newState[0] = null;
-        return newState;
-      });
+      }
     }
-    if (words[1] != "") {
-      applyPCA(tf.tensor1d(embeddings.get(words[1]))).then((word2) => {
-        setPlottedVecs((oldState) => {
-          const newState = [...oldState];
-          newState[1] = {
-            vec: word2,
-            color: "#0000ff",
-            animate: true,
-          };
-          return newState;
-        });
-      });
-    } else {
-      setPlottedVecs((oldState) => {
-        const newState = [...oldState];
-        newState[1] = null;
-        return newState;
-      });
-    }
-  }, [words[0], words[1]]);
+  }, [...words]);
 
   let backgroundGiven = true;
   if (background === "#123456") {
