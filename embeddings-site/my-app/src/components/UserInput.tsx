@@ -32,7 +32,7 @@ const UserInput: React.FC<Props> = ({
   return (
     <>
       <input
-        className="bg-my-beige rounded-xl text-black focus:outline-none text-center font-idk placeholder:opacity-20"
+        className="bg-my-beige rounded-xl text-black focus:outline-none text-center font-curvy placeholder:opacity-20"
         type="text"
         required
         readOnly={loading}

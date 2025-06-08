@@ -72,6 +72,7 @@ type GraphProps = {
   background?: string;
   axisColor?: string;
   axisWidth?: number;
+  gridSize?: number;
 };
 
 const Axis = ({
@@ -119,9 +120,10 @@ const Axis = ({
 export const VectorGraph: React.FC<GraphProps> = ({
   words = ["", ""],
   size = 500,
-  background = "#111",
+  background = "#123456",
   axisColor = "#888",
   axisWidth = 1,
+  gridSize = 10,
 }) => {
   const { embeddings } = useEmbeddings();
   type vecType = ({
@@ -174,13 +176,25 @@ export const VectorGraph: React.FC<GraphProps> = ({
     }
   }, [words[0], words[1]]);
 
+  let backgroundGiven = true;
+  if (background === "#123456") {
+    backgroundGiven = false;
+  }
+
+  const canvasCompProp = !background
+    ? {
+        camera: { position: [1.5, 2, 3] },
+        gl: { alpha: true },
+        style: { background: "transparant" },
+      }
+    : { camera: { position: [0.7, 1.2, 2.2] } };
   return (
     <div style={{ width: size, height: size }}>
-      <Canvas camera={{ position: [1.5, 2, 3] }}>
-        <color attach="background" args={[background]} />
+      <Canvas {...canvasCompProp}>
+        {backgroundGiven && <color attach="background" args={[background]} />}
         <ambientLight intensity={0.6} />
         <pointLight position={[10, 10, 10]} />
-        <gridHelper args={[100, 100]} />
+        <gridHelper args={[gridSize, gridSize]} />
         <OrbitControls makeDefault />
         <Axis color={axisColor} width={axisWidth} length={1.5} />
 

@@ -34,8 +34,8 @@ const CosSimSection: React.FC = () => {
   }
 
   return (
-    <div className="h-fit flex-col pt-10 bg-my-beige-tranparent border-black ring-2 m-10 rounded-full">
-      <div className="flex justify-center text-2xl font-bold font-idk">
+    <div className="h-fit flex-col pt-10 bg-my-beige-tranparent border-black ring-2 m-10 mt-0 rounded-full">
+      <div className="flex justify-center text-2xl font-bold font-curvy">
         <h1>Cosine Similarity Between</h1>
       </div>
       <div className="pt-5 flex flex-row justify-center text-2xl">
@@ -44,14 +44,14 @@ const CosSimSection: React.FC = () => {
           currIsValidWord={currWordIsValid}
           onValidWord={handleValidWord}
         />
-        <h1 className="font-idk px-10 font-bold">&</h1>
+        <h1 className="font-curvy px-10 font-bold">&</h1>
         <UserInput
           inputId={1}
           currIsValidWord={currWordIsValid}
           onValidWord={handleValidWord}
         />
       </div>
-      <div className="flex-col text-center min-h-16 pt-2 font-idk font-bold">
+      <div className="flex-col text-center min-h-16 pt-2 font-curvy font-bold">
         <h1>{cosSimText ? "Is" : ""}</h1>
         <label>{cosSimText ? cosSimText : ""}</label>
       </div>
@@ -59,10 +59,11 @@ const CosSimSection: React.FC = () => {
       <div className="flex justify-center pb-10">
         <VectorGraph
           words={validWord}
+          // background="#000"
           size={400}
-          background="#00ff0000"
-          axisColor="white"
+          axisColor="#000"
           axisWidth={2}
+          gridSize={0}
         />
       </div>
     </div>
