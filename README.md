@@ -1,5 +1,3 @@
-# word-embeddings
-
 # Word Embedding Playground 💬
 
 An interactive React web app for exploring the structure and logic of word embeddings using the GloVe dataset. Includes real-time vector arithmetic, similarity search, and PCA-based 3D visualization—all powered by precomputed data processed in C++.
@@ -11,6 +9,16 @@ An interactive React web app for exploring the structure and logic of word embed
 - **3D Visualization**: Type any valid words and see their vectors projected into 3D space via PCA.
 - **Efficient Frontend-Only Architecture**: No backend required—large embedding data and PCA projections are preprocessed in C++ and served as static JSON for the React app to consume on the fly.
 - **Learn as You Play**: Built-in educational content explains what embeddings are, how they work, and why they matter.
+
+## Demo
+
+
+<p style="display: flex; align-items:center">
+    <img src="assets/demo/cos-sim.gif" width="400" alt="Demo">
+    <img src="assets/demo/linguistic-arithmetic.gif" width="400" alt="Demo">
+</p>
+
+
 
 ## 🧠 Behind the Scenes
 
@@ -28,8 +36,8 @@ An interactive React web app for exploring the structure and logic of word embed
 ### Install & Run
 
 ```bash
-git clone https://github.com/yourusername/word-embedding-playground.git
-cd word-embedding-playground/embeddings-site/frontend
+git clone https://github.com/yourusername/word-embeddings-playground.git
+cd word-embeddings-playground/embeddings-site/frontend
 npm install
 npm run dev  # or npm start, depending on setup
 ```
